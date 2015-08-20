@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update -y
+    sudo apt-get install git curl -y
+  SHELL
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.26.0/install.sh | bash
+    echo "source ~/.nvm/nvm.sh" >> /home/vagrant/.bashrc
+    source /home/vagrant/.nvm/nvm.sh
+    
+    nvm install stable
+    nvm use stable
+    nvm alias default stable
+
+    npm config set bin-links false
+  SHELL
+end
